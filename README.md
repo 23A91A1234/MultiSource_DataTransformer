@@ -1,73 +1,134 @@
-# Multi-Source Candidate Data Transformer
+# 🔮 Multi-Source Candidate Data Transformer ("Data Alchemy")
 
-A full-stack, single-monorepo application for ingesting candidate profiles from multiple structured and unstructured sources, deduplicating them into a single canonical record with complete provenance and confidence scoring, and projecting them into custom output shapes using a runtime configuration.
-
-## Features
-- **Deterministic Pipeline**: Pure functions process data from detection through extraction, normalization, merging, confidence calculation, and projection.
-- **Deduplication Engine**: Matches candidates based on normalized emails, E.164 phones, or fuzzy name similarity combined with secondary signals.
-- **Traceability**: All output fields record the original source and resolution method in a `provenance` log.
-- **Dynamic Projection**: Supports runtime configuration schemas using JSON shapes to filter, rename, or normalize output keys.
+A full-stack, single-monorepo application designed to ingest candidate profiles from multiple structured and unstructured sources, deduplicate them into a single canonical record with complete provenance tracking, and project them into custom output shapes using dynamic runtime configurations.
 
 ---
 
-## Tech Stack
-- **Backend**: Node.js + Express (JavaScript, ES Modules)
-- **Frontend**: React + Vite (JavaScript, HSL dark mode, Glassmorphic UI)
-- **Database**: MongoDB via Mongoose
-- **Parser Tools**: Papaparse (CSV), PDF-Parse (PDF), Mammoth (DOCX), Libphonenumber-js (Phone), Day.js (Date), Fuse.js (Fuzzy Matching)
-- **Validation**: Zod (Canonical profiles and dynamic custom projections)
+## 🖼️ Application Screenshot
+
+Here is the design mockup of the alchemical user interface:
+
+![Data Alchemy Dashboard](alchemy_dashboard.png)
+
+---
+
+## ⚙️ Data Alchemy Workflow
+
+The deduplication pipeline runs as a series of pure, deterministic functions, transforming messy, raw inputs into refined, canonical profiles:
+
+```mermaid
+graph TD
+    %% Source Ingestion
+    subgraph Inputs [Messy Data Sources]
+        src_csv[Recruiter CSV File]
+        src_ats[ATS JSON File]
+        src_git[GitHub API Username]
+        src_ln[LinkedIn profile URL]
+        src_pdf[Resume PDF/Word]
+        src_notes[Recruiter Notes .txt]
+    end
+
+    %% Pipeline Steps
+    subgraph Pipeline [Deterministic Transformation Pipeline]
+        step1[1. Detect Source Format]
+        step2[2. Extract Raw fields]
+        step3[3. Normalize Field Values]
+        step4[4. Deduplicate & Merge Records]
+        step5[5. Calculate Provenance & Confidence]
+        step6[6. Apply Output Projection Schema]
+    end
+
+    %% Output
+    subgraph Output [Refined Target Data]
+        target_db[(MongoDB Atlas History)]
+        target_ui[React Dashboard View]
+        target_json[Custom Projected JSON File]
+    end
+
+    %% Routing
+    Inputs --> step1
+    step1 --> step2
+    step2 --> step3
+    step3 --> step4
+    step4 --> step5
+    step5 --> step6
+    step6 --> target_db
+    step6 --> target_ui
+    step6 --> target_json
+```
+
+---
+
+## 🚀 Key Features
+
+1. **Pure Data Ingestion Pipeline**: Ingests, parses, and normalizes unstructured strings, binary PDFs, Word documents, and structured tables without side effects.
+2. **Deterministic Deduplication**: Merges candidate profiles by correlating normalized E.164 phone numbers, lowercased email addresses, or fuzzy name similarity.
+3. **Traceability & Provenance**: Tracks the origin of every single field value down to the file name and the merge rule applied.
+4. **Dynamic Output Projection**: Filters, renames, and formats canonical schemas into custom JSON shapes dynamically at runtime using custom JSON config templates.
+5. **Real-time Health Diagnostics**: Detects backend server liveness and MongoDB connectivity, displaying alerts and status details on the fly.
+
+---
+
+## 🛠️ Technology Stack
+
+- **Frontend**: React + Vite (Custom Glassmorphic "Data Alchemy" Warm Dark Theme)
+- **Backend**: Node.js + Express (Modern ES Modules, Stateless controllers)
+- **Database**: MongoDB via Mongoose (with database liveness connection flags)
+- **Engines**: 
+  - `papaparse` (CSV Parser)
+  - `pdf-parse` (PDF text extractor)
+  - `mammoth` (DOCX converter)
+  - `fuse.js` (Fuzzy name & skill matcher)
+  - `zod` (Zod schemas for projection validation)
 - **Testing**: Vitest
 
 ---
 
-## Scaffolding & Setup
+## 📦 Setup & Installation
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) (v18 or higher recommended)
-- [MongoDB](https://www.mongodb.com/) (running locally on port 27017, or a custom URI)
+- **Node.js** (v18 or higher recommended)
+- **MongoDB** (A local MongoDB service running on port 27017, OR a cloud-based MongoDB Atlas cluster URI)
 
-### Installation
-1. Install all dependencies for both client and server from the monorepo root:
+### Setup Commands
+1. **Clone the repository** and navigate to the project folder.
+2. **Install all dependencies** for both backend and frontend from the monorepo root:
    ```bash
    npm run install:all
    ```
-   *(This runs `npm install` inside both `/server` and `/client` directories automatically).*
-
-2. Alternatively, install them manually:
+3. **Create the Environment Config**:
+   Create a `.env` file inside the `server/` directory:
    ```bash
-   # Server
-   cd server && npm install
-   # Client
-   cd ../client && npm install
-   ```
-
-3. Set up the backend environment:
-   ```bash
-   # From the server directory, copy the example env:
+   # From the server directory
    cp .env.example .env
+   ```
+   Modify `server/.env` to configure your connection string:
+   ```env
+   PORT=5000
+   MONGO_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/candidate_db?appName=Cluster0
    ```
 
 ---
 
-## Run Instructions
+## 🏃 Run Instructions
 
-### Starting Server and Client Simultaneously (Recommended)
-You can run both the Express backend and React frontend with a single command from the monorepo root:
+### Starting the Server & Client Together (Recommended)
+You can launch both services concurrently from the repository root:
 ```bash
 npm run dev
 ```
-This launches:
-- Backend: [http://localhost:5000](http://localhost:5000)
-- Frontend: [http://localhost:3000](http://localhost:3000) (with `/api` routing proxy enabled)
+This boots:
+- **Frontend Dashboard**: [http://localhost:3000](http://localhost:3000)
+- **Backend API Server**: [http://localhost:5000](http://localhost:5000)
 
-### Starting Server and Client Separately (Alternative)
-If you prefer separate terminal logs:
-1. Start the Express backend:
+### Starting Services Separately
+If you need isolated console outputs:
+1. **Start Backend**:
    ```bash
    cd server
    npm start
    ```
-2. Start the React frontend development server:
+2. **Start Frontend**:
    ```bash
    cd client
    npm run dev
@@ -75,25 +136,26 @@ If you prefer separate terminal logs:
 
 ---
 
-## CLI Surface
-A command-line script is provided to run the transformer over local files.
+## 🖥️ Command Line Interface (CLI)
+
+The transformer can run directly in the terminal over local files.
 
 ```bash
-# From the server directory:
-# Run on sample files using the default config:
+# Run over raw files and save output:
 npm run cli -- run --sources ../samples/recruiter_sample.csv,../samples/ats_sample.json --out ./output.json
 
-# Run on sample files with a custom projection config:
-npm run cli -- run --sources ../samples/recruiter_sample.csv,../samples/ats_sample.json --config ../config.example.json --out ./output_projected.json
+# Run with a custom projection config schema:
+npm run cli -- run --sources ../samples --config ../config.example.json --out ./projected_output.json
 
-# Run on sample files and skip database writes (fast local testing):
+# Run pipeline locally without writing to the database:
 npm run cli -- run --sources ../samples --out ./output.json --no-persist
 ```
 
 ---
 
-## Running Automated Tests
-Tests are located in `server/tests/` and run using Vitest.
+## 🧪 Testing
+
+Run the full Vitest suite to verify parsing and pipeline regression correctness:
 
 ```bash
 cd server
@@ -102,12 +164,9 @@ npm run test
 
 ---
 
-## Assumptions
+## 🧠 Design Rules & Assumptions
 
-The following design choices and constraints were adopted:
-1. **LinkedIn Integration**: Public access to LinkedIn profile data is restricted. When a LinkedIn URL is submitted, the extractor checks for a matching JSON file under the `server/tests/fixtures/` or `samples/` directory. If no fixture matches and a name cannot be derived from the URL slug, the extractor degrades gracefully, returning empty fields with `raw_confidence: 0` (it never invents mock data). When a name can be derived from the URL slug (e.g. `https://linkedin.com/in/bhavana-siva-sri`), it extracts the name as a low-confidence guess (`raw_confidence: 0.3`) with all other fields blank.
-2. **Skill Canonicalization**: Standardizing skills utilizes a hand-curated list of ~30 popular developer skills. Fuzzy matching is performed with `fuse.js`. Any unknown skill found on a resume is preserved as-is but assigned a lower default confidence score (`0.4`) to indicate it did not verify against the standard taxonomy.
-3. **Source Priority Order**: When scalar fields disagree (e.g. different names on different resumes), conflict resolution prefers the source with the highest raw confidence. In the event of a tie, the system falls back to this source order:
+1. **No-Fabrication LinkedIn Rule**: LinkedIn URLs degrade gracefully to empty fields with `raw_confidence: 0` if no fixture matches, preventing the pipeline from inventing candidate data. Derivable name slugs are guessed at a low confidence score of `0.3`.
+2. **Conflict Resolution Order**: Disagreements in field values prefer the source with the highest confidence. Ties fall back to the default priority order:
    `ats_json > recruiter_csv > linkedin_json > github_api > resume > recruiter_notes`
-4. **Recruiter Notes Confidence**: Text notes (.txt) are treated as freeform, unstructured, and highly subjective. Thus, they are given a low default raw confidence score of `0.3`.
-5. **MongoDB / Database Liveness**: The pipeline itself remains database-agnostic. It runs in-memory as pure functions so it can run offline or in `--no-persist` mode without a running MongoDB connection. If a local MongoDB instance is not installed or running, you can connect to a free MongoDB Atlas cluster by setting the `MONGODB_URI` environment variable in `server/.env` to your Atlas connection string.
+3. **Graceful Database Failover**: Database persistence runs completely decoupled from the data extraction engine. If MongoDB is stopped, pipeline runs continue to execute in-memory.
