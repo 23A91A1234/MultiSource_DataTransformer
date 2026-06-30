@@ -710,7 +710,7 @@ export default function App() {
 
   return (
     <div className="container animate-fade-in">
-      <header style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <header style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <h1 style={{ fontSize: '36px', marginBottom: '8px' }}>
             Candidate Data <span className="gradient-text">Transformer</span>
