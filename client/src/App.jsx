@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+
 function CandidateCard({ profile }) {
   const [showJson, setShowJson] = useState(false);
   const [showProvenance, setShowProvenance] = useState(false);
@@ -297,7 +299,7 @@ export default function App() {
 
   const checkHealth = async () => {
     try {
-      const res = await fetch('/api/health');
+      const res = await fetch(API_BASE + '/api/health');
       const data = await res.json();
       const connected = data.database?.status === 'connected';
       setDbStatus({ reachable: true, connected });
@@ -329,7 +331,7 @@ export default function App() {
   const fetchPastRuns = async () => {
     checkHealth();
     try {
-      const res = await fetch('/api/runs');
+      const res = await fetch(API_BASE + '/api/runs');
       if (res.ok) {
         const data = await res.json();
         setPastRuns(data);
@@ -341,7 +343,7 @@ export default function App() {
 
   const fetchDefaultConfig = async () => {
     try {
-      const res = await fetch('/api/config/default');
+      const res = await fetch(API_BASE + '/api/config/default');
       if (res.ok) {
         const data = await res.json();
         setCustomConfig(JSON.stringify(data, null, 2));
@@ -354,7 +356,7 @@ export default function App() {
   const fetchSavedConfigs = async () => {
     checkHealth();
     try {
-      const res = await fetch('/api/configs');
+      const res = await fetch(API_BASE + '/api/configs');
       if (res.ok) {
         const data = await res.json();
         setSavedConfigs(data);
@@ -452,7 +454,7 @@ export default function App() {
         }
       }
 
-      const res = await fetch('/api/pipeline/run', {
+      const res = await fetch(API_BASE + '/api/pipeline/run', {
         method: 'POST',
         body: formData
       });
@@ -485,7 +487,7 @@ export default function App() {
     setResult(null);
     setWarnings([]);
     try {
-      const res = await fetch(`/api/runs/${runId}`);
+      const res = await fetch(API_BASE + `/api/runs/${runId}`);
       const text = await res.text();
       let data = {};
       try {
@@ -520,7 +522,7 @@ export default function App() {
         throw new Error('Malformed JSON Config: ' + err.message);
       }
 
-      const res = await fetch(`/api/pipeline/project/${selectedRun.run._id}`, {
+      const res = await fetch(API_BASE + `/api/pipeline/project/${selectedRun.run._id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -559,7 +561,7 @@ export default function App() {
         return;
       }
 
-      const res = await fetch('/api/configs', {
+      const res = await fetch(API_BASE + '/api/configs', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
