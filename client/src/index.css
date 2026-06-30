@@ -1,32 +1,48 @@
-/* Modern Design Tokens and Styling System */
+/* Modern Design Tokens and Styling System - Data Alchemy Theme */
 :root {
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-display: 'Outfit', sans-serif;
+  --font-display: 'Space Grotesk', 'Outfit', sans-serif;
 
-  /* HSL Tailored Dark Theme Colors */
-  --bg-primary: hsl(222, 47%, 11%);
-  --bg-secondary: hsl(223, 47%, 16%);
-  --bg-tertiary: hsl(224, 47%, 21%);
-  
-  --text-primary: hsl(210, 40%, 96%);
-  --text-muted: hsl(215, 20%, 65%);
-  --text-dark: hsl(215, 20%, 45%);
+  /* Base surfaces: warm charcoal instead of cool navy */
+  --bg-primary: hsl(20, 14%, 8%);
+  --bg-secondary: hsl(20, 13%, 13%);
+  --bg-tertiary: hsl(20, 12%, 18%);
 
-  --accent-blue: hsl(217, 91%, 60%);
-  --accent-cyan: hsl(190, 95%, 50%);
-  --accent-purple: hsl(263, 90%, 62%);
-  --accent-green: hsl(142, 70%, 50%);
-  --accent-orange: hsl(24, 95%, 60%);
-  
-  --border-glass: rgba(255, 255, 255, 0.08);
-  --bg-glass: rgba(255, 255, 255, 0.03);
-  --bg-glass-hover: rgba(255, 255, 255, 0.06);
+  --text-primary: hsl(35, 25%, 95%);
+  --text-muted: hsl(30, 10%, 65%);
+  --text-dark: hsl(30, 8%, 45%);
+
+  /* Primary accent: amber/gold (the "refined gold" of the alchemy metaphor) */
+  --accent-gold: hsl(38, 92%, 58%);
+  --accent-gold-soft: hsl(38, 92%, 58%, 0.15);
+
+  /* Secondary accent: deep teal (contrast color, used for links/secondary actions) */
+  --accent-teal: hsl(178, 65%, 45%);
+
+  /* Confidence/status colors - keep semantically similar but warmer */
+  --accent-green: hsl(150, 55%, 48%);   /* high confidence */
+  --accent-orange: hsl(28, 90%, 56%);   /* medium confidence / warnings */
+  --accent-red: hsl(355, 75%, 58%);     /* low confidence / errors */
+
+  /* Source-type colors - give each source type its own identity color */
+  --source-csv: hsl(150, 55%, 48%);
+  --source-ats: hsl(265, 60%, 65%);
+  --source-github: hsl(220, 15%, 70%);
+  --source-linkedin: hsl(201, 90%, 55%);
+  --source-resume: hsl(38, 92%, 58%);
+  --source-notes: hsl(340, 70%, 60%);
+
+  --border-glass: hsla(38, 30%, 80%, 0.08);
+  --bg-glass: hsla(38, 30%, 80%, 0.03);
+  --bg-glass-hover: hsla(38, 30%, 80%, 0.07);
 
   --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.5);
   --shadow-md: 0 8px 30px -4px rgba(0, 0, 0, 0.6);
   --shadow-lg: 0 16px 40px -10px rgba(0, 0, 0, 0.8);
+  --shadow-glow-gold: 0 0 24px -4px hsla(38, 92%, 58%, 0.35);
 
   --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); /* for playful pop-in effects */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 20px;
@@ -46,8 +62,8 @@ body {
   line-height: 1.5;
   overflow-x: hidden;
   background-image: 
-    radial-gradient(at 0% 0%, hsla(217, 91%, 60%, 0.1) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, hsla(263, 90%, 62%, 0.1) 0px, transparent 50%);
+    radial-gradient(at 0% 0%, hsla(38, 92%, 58%, 0.07) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, hsla(178, 65%, 45%, 0.07) 0px, transparent 50%);
 }
 
 h1, h2, h3, h4 {
@@ -69,7 +85,7 @@ h1, h2, h3, h4 {
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-blue);
+  background: var(--accent-gold);
 }
 
 /* Glassmorphism Containers */
@@ -108,8 +124,8 @@ select {
 input[type="text"]:focus,
 textarea:focus,
 select:focus {
-  border-color: var(--accent-blue);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 0 3px hsla(38, 92%, 58%, 0.15);
   background: var(--bg-tertiary);
 }
 
@@ -144,14 +160,14 @@ label {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  background: linear-gradient(135deg, var(--accent-gold), var(--accent-teal));
   color: #fff;
-  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 20px hsla(38, 92%, 58%, 0.2);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(59, 130, 246, 0.5);
+  box-shadow: 0 6px 24px hsla(38, 92%, 58%, 0.4);
   filter: brightness(1.1);
 }
 
@@ -197,7 +213,7 @@ label {
 
 /* Typography Gradient */
 .gradient-text {
-  background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
+  background: linear-gradient(135deg, var(--text-primary), var(--accent-gold));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -210,4 +226,39 @@ label {
 
 .animate-fade-in {
   animation: fadeIn 0.4s ease forwards;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.9); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.5; }
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--accent-gold);
+  animation: pulse 1s infinite;
+  margin-left: auto;
+}
+
+@keyframes cardSlideIn {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.alchemy-card {
+  animation: cardSlideIn 0.5s var(--transition-bounce) forwards;
+  opacity: 0;
+}
+
+@keyframes flaskPulse {
+  0% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 4px var(--accent-gold-soft)); }
+  50% { transform: translateY(-6px) scale(1.03); filter: drop-shadow(0 0 16px hsla(38, 92%, 58%, 0.3)); }
+  100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 4px var(--accent-gold-soft)); }
+}
+
+.flask-animate {
+  animation: flaskPulse 3.5s ease-in-out infinite;
 }

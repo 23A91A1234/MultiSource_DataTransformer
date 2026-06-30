@@ -2,7 +2,19 @@ import React, { useState, useEffect } from 'react';
 
 const API_BASE = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '';
 
-function CandidateCard({ profile }) {
+const FlaskIllustration = () => (
+  <div className="flask-animate" style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+    <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+      <path d="M26 12H38V22L50 44C53 49 49 54 44 54H20C15 54 11 49 14 44L26 22V12Z" stroke="var(--accent-gold)" strokeWidth="3" strokeLinejoin="round" />
+      <path d="M19 44C16 39 19 32 24 32C29 32 30 35 34 35C38 35 40 31 45 31C50 31 51 36 49 40C47 44 44 48 44 48H20C20 48 20 45 19 44Z" fill="var(--accent-teal)" opacity="0.7" />
+      <circle cx="28" cy="24" r="2" fill="var(--accent-gold)" />
+      <circle cx="34" cy="20" r="3" fill="var(--accent-gold)" />
+      <circle cx="31" cy="16" r="1.5" fill="var(--accent-gold)" />
+    </svg>
+  </div>
+);
+
+function CandidateCard({ profile, index }) {
   const [showJson, setShowJson] = useState(false);
   const [showProvenance, setShowProvenance] = useState(false);
   const [expandedExps, setExpandedExps] = useState({});
@@ -14,7 +26,24 @@ function CandidateCard({ profile }) {
   const getConfidenceBadgeColor = (score) => {
     if (score >= 0.8) return 'var(--accent-green)';
     if (score >= 0.5) return 'var(--accent-orange)';
-    return '#ef4444';
+    return 'var(--accent-red)';
+  };
+
+  const getSourceColor = (sourceId) => {
+    const src = String(sourceId).toLowerCase();
+    if (src.includes('csv')) return 'var(--source-csv)';
+    if (src.includes('ats') || src.includes('json') && !src.includes('linkedin')) return 'var(--source-ats)';
+    if (src.includes('github')) return 'var(--source-github)';
+    if (src.includes('linkedin')) return 'var(--source-linkedin)';
+    if (src.includes('pdf') || src.includes('docx') || src.includes('resume')) return 'var(--source-resume)';
+    if (src.includes('notes') || src.includes('notes_sample') || src.includes('txt')) return 'var(--source-notes)';
+    return 'var(--accent-gold)';
+  };
+
+  const getSkillColor = (confidence) => {
+    const conf = confidence || 0.5;
+    const hue = 38 + conf * (178 - 38);
+    return `hsl(${hue}, 75%, 52%)`;
   };
 
   const formatRangeDate = (dateStr) => {
@@ -32,15 +61,30 @@ function CandidateCard({ profile }) {
   const phone = profile.phones && profile.phones[0];
 
   return (
-    <div className="glass-panel animate-fade-in" style={{
-      marginBottom: '24px',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '16px',
-      background: 'rgba(255, 255, 255, 0.015)'
-    }}>
+    <div 
+      className="glass-panel alchemy-card" 
+      style={{
+        marginBottom: '24px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+        background: 'rgba(255, 255, 255, 0.015)',
+        animationDelay: `${index * 60}ms`,
+        transition: 'var(--transition-smooth)'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'translateY(-4px)';
+        e.currentTarget.style.boxShadow = 'var(--shadow-glow-gold)';
+        e.currentTarget.style.borderColor = 'var(--accent-gold)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'none';
+        e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+        e.currentTarget.style.borderColor = 'var(--border-glass)';
+      }}
+    >
       {/* Card Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid var(--border-glass)', paddingBottom: '12px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-glass)', paddingBottom: '12px' }}>
         <div>
           <h3 style={{ fontSize: '22px', color: '#fff', margin: 0 }}>
             {profile.full_name || 'Unknown Candidate'}
@@ -51,24 +95,51 @@ function CandidateCard({ profile }) {
             </div>
           )}
         </div>
-        <div style={{
-          background: 'rgba(0,0,0,0.2)',
-          padding: '6px 12px',
-          borderRadius: '16px',
-          border: `1px solid ${getConfidenceBadgeColor(profile.overall_confidence || 0)}`,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px'
-        }}>
-          <span style={{
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            backgroundColor: getConfidenceBadgeColor(profile.overall_confidence || 0)
-          }} />
-          <span style={{ fontSize: '12px', fontWeight: '700', color: '#fff' }}>
-            {Math.round((profile.overall_confidence || 0) * 100)}% Match
-          </span>
+        
+        {/* Confidence Gauge */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ position: 'relative', width: '52px', height: '52px' }}>
+            <svg width="52" height="52" viewBox="0 0 52 52" style={{ transform: 'rotate(-90deg)' }}>
+              <circle cx="26" cy="26" r="22" fill="none" stroke="var(--bg-tertiary)" strokeWidth="4" />
+              <circle 
+                cx="26" 
+                cy="26" 
+                r="22" 
+                fill="none" 
+                stroke={getConfidenceBadgeColor(profile.overall_confidence || 0)} 
+                strokeWidth="4" 
+                strokeDasharray="138.2" 
+                strokeDashoffset={138.2 - ((profile.overall_confidence || 0) * 138.2)} 
+                style={{
+                  transition: 'stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1)',
+                  strokeLinecap: 'round'
+                }}
+              />
+            </svg>
+            <div style={{
+              position: 'absolute',
+              top: 0, left: 0, right: 0, bottom: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '11px',
+              fontWeight: '700',
+              color: '#fff'
+            }}>
+              {Math.round((profile.overall_confidence || 0) * 100)}%
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
+            <span style={{ 
+              fontSize: '10px', 
+              fontWeight: '800', 
+              color: getConfidenceBadgeColor(profile.overall_confidence || 0), 
+              letterSpacing: '0.05em' 
+            }}>
+              {(profile.overall_confidence || 0) >= 0.85 ? 'REFINED' : ((profile.overall_confidence || 0) >= 0.5 ? 'STABLE' : 'UNSTABLE')}
+            </span>
+            <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>Confidence</span>
+          </div>
         </div>
       </div>
 
@@ -85,17 +156,17 @@ function CandidateCard({ profile }) {
           </span>
         )}
         {profile.links?.linkedin && (
-          <a href={profile.links.linkedin} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)', padding: '4px 10px', borderRadius: '4px', fontSize: '12px', color: 'var(--accent-blue)', textDecoration: 'none' }}>
+          <a href={profile.links.linkedin} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(20, 150, 150, 0.1)', border: '1px solid rgba(20, 150, 150, 0.2)', padding: '4px 10px', borderRadius: '4px', fontSize: '12px', color: 'var(--accent-teal)', textDecoration: 'none' }}>
             🔗 LinkedIn
           </a>
         )}
         {profile.links?.github && (
-          <a href={profile.links.github} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(139, 92, 246, 0.1)', border: '1px solid rgba(139, 92, 246, 0.2)', padding: '4px 10px', borderRadius: '4px', fontSize: '12px', color: 'var(--accent-purple)', textDecoration: 'none' }}>
+          <a href={profile.links.github} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)', padding: '4px 10px', borderRadius: '4px', fontSize: '12px', color: 'var(--accent-gold)', textDecoration: 'none' }}>
             💻 GitHub
           </a>
         )}
         {profile.links?.portfolio && (
-          <a href={profile.links.portfolio} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(34, 211, 238, 0.1)', border: '1px solid rgba(34, 211, 238, 0.2)', padding: '4px 10px', borderRadius: '4px', fontSize: '12px', color: 'var(--accent-cyan)', textDecoration: 'none' }}>
+          <a href={profile.links.portfolio} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(20, 150, 150, 0.1)', border: '1px solid rgba(20, 150, 150, 0.2)', padding: '4px 10px', borderRadius: '4px', fontSize: '12px', color: 'var(--accent-teal)', textDecoration: 'none' }}>
             🌐 Portfolio
           </a>
         )}
@@ -106,28 +177,45 @@ function CandidateCard({ profile }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)' }}>SKILLS</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-            {profile.skills.map((skill, sIdx) => (
-              <div key={sIdx} style={{
-                background: 'var(--bg-secondary)',
-                border: '1px solid var(--border-glass)',
-                borderRadius: '16px',
-                padding: '4px 12px',
-                fontSize: '11px',
-                position: 'relative',
-                overflow: 'hidden',
-                display: 'inline-block'
-              }}>
-                {skill.name} <span style={{ opacity: 0.6, fontSize: '9px' }}>({Math.round((skill.confidence || 0.4) * 100)}%)</span>
-                <div style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  height: '3px',
-                  width: `${(skill.confidence || 0.4) * 100}%`,
-                  background: 'linear-gradient(90deg, var(--accent-blue), var(--accent-cyan))'
-                }} />
-              </div>
-            ))}
+            {profile.skills.map((skill, sIdx) => {
+              const skillColor = getSkillColor(skill.confidence);
+              return (
+                <div 
+                  key={sIdx} 
+                  style={{
+                    background: 'var(--bg-secondary)',
+                    border: `1px solid ${skillColor}`,
+                    borderRadius: '16px',
+                    padding: '4px 12px',
+                    fontSize: '11px',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    display: 'inline-block',
+                    transition: 'var(--transition-smooth)',
+                    cursor: 'default',
+                    boxShadow: `0 0 4px ${skillColor}22`
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.06)';
+                    e.currentTarget.style.filter = 'brightness(1.2)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'none';
+                    e.currentTarget.style.filter = 'none';
+                  }}
+                >
+                  {skill.name} <span style={{ opacity: 0.6, fontSize: '9px' }}>({Math.round((skill.confidence || 0.4) * 100)}%)</span>
+                  <div style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    height: '3px',
+                    width: `${(skill.confidence || 0.4) * 100}%`,
+                    background: skillColor
+                  }} />
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -150,7 +238,7 @@ function CandidateCard({ profile }) {
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '4px' }}>
                     <div style={{ fontWeight: '700', fontSize: '14px', color: '#fff' }}>
-                      {exp.title || 'Role'} {exp.company && <span style={{ color: 'var(--accent-cyan)', fontWeight: 'normal' }}>at {exp.company}</span>}
+                      {exp.title || 'Role'} {exp.company && <span style={{ color: 'var(--accent-teal)', fontWeight: 'normal' }}>at {exp.company}</span>}
                     </div>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{dates}</div>
                   </div>
@@ -160,7 +248,7 @@ function CandidateCard({ profile }) {
                       {exp.summary.length > 150 && (
                         <span 
                           onClick={() => toggleExp(idx)}
-                          style={{ color: 'var(--accent-blue)', cursor: 'pointer', marginLeft: '6px', fontWeight: '600' }}
+                          style={{ color: 'var(--accent-teal)', cursor: 'pointer', marginLeft: '6px', fontWeight: '600' }}
                         >
                           {isExpanded ? 'Show less' : 'Read more'}
                         </span>
@@ -204,7 +292,7 @@ function CandidateCard({ profile }) {
         <div style={{ marginTop: '4px' }}>
           <div 
             onClick={() => setShowProvenance(!showProvenance)}
-            style={{ fontSize: '12px', fontWeight: '700', color: 'var(--accent-cyan)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+            style={{ fontSize: '12px', fontWeight: '700', color: 'var(--accent-gold)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
           >
             {showProvenance ? '▼ Hide Source Provenance' : '▶ Show Source Provenance'}
           </div>
@@ -228,13 +316,40 @@ function CandidateCard({ profile }) {
                 <div>Resolved Source</div>
                 <div>Merge Method</div>
               </div>
-              {profile.provenance.map((prov, pIdx) => (
-                <div key={pIdx} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', borderBottom: '1px solid rgba(255,255,255,0.02)', paddingBottom: '4px' }}>
-                  <div style={{ fontWeight: '600', color: 'var(--accent-blue)' }}>{prov.field}</div>
-                  <div style={{ wordBreak: 'break-all' }}>📄 {prov.source}</div>
-                  <div style={{ opacity: 0.6 }}>{prov.method}</div>
-                </div>
-              ))}
+              {profile.provenance.map((prov, pIdx) => {
+                const dotColor = getSourceColor(prov.source);
+                return (
+                  <div key={pIdx} style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: '1fr 1fr 1fr', 
+                    gap: '8px', 
+                    borderBottom: '1px solid rgba(255,255,255,0.02)', 
+                    padding: '6px 0', 
+                    alignItems: 'center' 
+                  }}>
+                    <div style={{ fontWeight: '600', color: 'var(--accent-teal)' }}>{prov.field}</div>
+                    <div>
+                      <span style={{ 
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        background: 'var(--bg-secondary)',
+                        border: `1px solid ${dotColor}`,
+                        borderRadius: '12px',
+                        padding: '2px 10px',
+                        fontSize: '10px',
+                        fontWeight: '600',
+                        color: 'var(--text-primary)',
+                        boxShadow: `0 0 6px ${dotColor}33`
+                      }}>
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: dotColor }} />
+                        {prov.source}
+                      </span>
+                    </div>
+                    <div style={{ opacity: 0.6 }}>{prov.method}</div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
@@ -250,12 +365,12 @@ function CandidateCard({ profile }) {
         </div>
         {showJson && (
           <pre style={{
-            background: '#05070f',
+            background: '#090807',
             border: '1px solid var(--border-glass)',
             borderRadius: '6px',
             padding: '16px',
             fontSize: '11px',
-            color: 'var(--accent-cyan)',
+            color: 'var(--accent-gold)',
             overflow: 'auto',
             maxHeight: '300px',
             marginTop: '8px'
@@ -278,6 +393,7 @@ export default function App() {
   // Pipeline state
   const [loading, setLoading] = useState(false);
   const [loadingStage, setLoadingStage] = useState('');
+  const [activeStageIdx, setActiveStageIdx] = useState(-1);
   const [dragOver, setDragOver] = useState(false);
   const [result, setResult] = useState(null);
   const [warnings, setWarnings] = useState([]);
@@ -381,12 +497,15 @@ export default function App() {
       ];
       let currentIdx = 0;
       setLoadingStage(stages[0]);
+      setActiveStageIdx(0);
       interval = setInterval(() => {
         currentIdx = (currentIdx + 1) % stages.length;
         setLoadingStage(stages[currentIdx]);
-      }, 900);
+        setActiveStageIdx(currentIdx);
+      }, 800);
     } else {
       setLoadingStage('');
+      setActiveStageIdx(-1);
     }
     return () => clearInterval(interval);
   }, [loading]);
@@ -709,14 +828,15 @@ export default function App() {
                   onDrop={handleDrop}
                   onClick={() => document.getElementById('file-input').click()}
                   style={{
-                    border: '2px dashed ' + (dragOver ? 'var(--accent-blue)' : 'var(--border-glass)'),
+                    border: '2px dashed ' + (dragOver ? 'var(--accent-gold)' : 'var(--border-glass)'),
                     borderRadius: 'var(--radius-md)',
                     padding: '30px 20px',
                     textAlign: 'center',
                     background: dragOver ? 'var(--bg-glass-hover)' : 'var(--bg-glass)',
                     cursor: 'pointer',
                     transition: 'var(--transition-smooth)',
-                    boxShadow: dragOver ? '0 0 15px rgba(59, 130, 246, 0.2)' : 'none'
+                    transform: dragOver ? 'scale(1.02)' : 'scale(1)',
+                    boxShadow: dragOver ? 'var(--shadow-glow-gold)' : 'none'
                   }}
                 >
                   <input 
@@ -727,9 +847,11 @@ export default function App() {
                     onChange={handleFileChange} 
                     style={{ display: 'none' }}
                   />
-                  <div style={{ fontSize: '28px', marginBottom: '8px' }}>📂</div>
+                  <div style={{ fontSize: '28px', marginBottom: '8px', transition: 'transform 0.2s' }}>
+                    {dragOver ? '🧪' : '📂'}
+                  </div>
                   <div style={{ fontWeight: '700', fontSize: '14px', marginBottom: '4px' }}>
-                    Drag & drop files here, or <span style={{ color: 'var(--accent-cyan)' }}>browse</span>
+                    Drag & drop files here, or <span style={{ color: 'var(--accent-gold)' }}>browse</span>
                   </div>
                   <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                     Supports CSV, JSON, PDF, DOCX, TXT
@@ -1039,7 +1161,7 @@ export default function App() {
           <div className="glass-panel" style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minHeight: '500px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <h2 style={{ fontSize: '20px' }}>Transformation Output</h2>
-              {loading && <span style={{ color: 'var(--accent-cyan)', fontSize: '14px' }}>⚡ In progress...</span>}
+              {loading && <span style={{ color: 'var(--accent-gold)', fontSize: '14px' }}>⚡ In progress...</span>}
             </div>
 
             {warnings.length > 0 && (
@@ -1062,7 +1184,7 @@ export default function App() {
               </div>
             )}
 
-            <div style={{ flexGrow: 1, position: 'relative', background: '#0a0f1d', borderRadius: '8px', border: '1px solid var(--border-glass)', minHeight: '400px' }}>
+            <div style={{ flexGrow: 1, position: 'relative', background: '#0a0908', borderRadius: '8px', border: '1px solid var(--border-glass)', minHeight: '400px' }}>
               {loading ? (
                 <div style={{
                   display: 'flex',
@@ -1071,45 +1193,73 @@ export default function App() {
                   height: '100%',
                   color: 'var(--text-primary)',
                   flexDirection: 'column',
-                  gap: '16px',
+                  gap: '24px',
                   padding: '40px 20px',
-                  textAlign: 'center',
                   position: 'absolute',
-                  top: 0, left: 0, right: 0, bottom: 0
+                  top: 0, left: 0, right: 0, bottom: 0,
+                  background: '#0a0908',
+                  borderRadius: '8px'
                 }}>
-                  <div className="flex-center" style={{
-                    width: '60px',
-                    height: '60px',
-                    borderRadius: '50%',
-                    border: '3px solid rgba(59, 130, 246, 0.1)',
-                    borderTopColor: 'var(--accent-cyan)',
-                    animation: 'spin 1s linear infinite',
-                    marginBottom: '8px'
-                  }} />
-                  <style>{`
-                    @keyframes spin {
-                      0% { transform: rotate(0deg); }
-                      100% { transform: rotate(360deg); }
-                    }
-                  `}</style>
-                  <div style={{ fontWeight: '700', fontSize: '18px', color: 'var(--accent-cyan)' }}>Executing Deduplication Pipeline</div>
-                  <div style={{ fontSize: '14px', color: 'var(--text-muted)', minHeight: '20px', transition: 'all 0.3s' }}>
-                    ⚡ {loadingStage}
+                  <div style={{ fontWeight: '750', fontSize: '18px', color: 'var(--accent-gold)' }}>
+                    🔮 Transmuting Messy Data...
                   </div>
+                  
+                  {/* Stages List */}
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px',
+                    width: '85%',
+                    maxWidth: '340px',
+                    textAlign: 'left',
+                    background: 'rgba(0,0,0,0.2)',
+                    padding: '20px',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--border-glass)'
+                  }}>
+                    {[
+                      { label: 'Detecting Format', icon: '🔍' },
+                      { label: 'Extracting Profiles', icon: '🧪' },
+                      { label: 'Normalizing Data', icon: '⚖️' },
+                      { label: 'Merging duplicates', icon: '🧬' },
+                      { label: 'Scoring Confidence', icon: '🎯' },
+                      { label: 'Projecting Output', icon: '🔮' },
+                      { label: 'Validating Schema', icon: '✅' }
+                    ].map((stage, idx) => {
+                      const isActive = activeStageIdx === idx;
+                      const isCompleted = activeStageIdx > idx;
+                      return (
+                        <div 
+                          key={idx}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            opacity: isActive ? 1 : (isCompleted ? 0.8 : 0.3),
+                            transform: isActive ? 'scale(1.05)' : 'scale(1)',
+                            transition: 'var(--transition-bounce)',
+                            color: isActive ? 'var(--accent-gold)' : (isCompleted ? 'var(--accent-green)' : 'var(--text-muted)'),
+                            fontWeight: isActive ? '700' : 'normal'
+                          }}
+                        >
+                          <span style={{ fontSize: '16px' }}>
+                            {isCompleted ? '✅' : stage.icon}
+                          </span>
+                          <span>{stage.label}</span>
+                          {isActive && <span className="pulse-dot" />}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Progress Line */}
                   <div style={{ width: '80%', background: 'var(--bg-secondary)', height: '4px', borderRadius: '2px', overflow: 'hidden', marginTop: '10px' }}>
                     <div style={{
                       height: '100%',
-                      background: 'linear-gradient(90deg, var(--accent-blue), var(--accent-cyan))',
-                      width: '60%',
-                      animation: 'progress 3s ease-in-out infinite'
+                      background: 'linear-gradient(90deg, var(--accent-gold), var(--accent-teal))',
+                      width: `${((activeStageIdx + 1) / 7) * 100}%`,
+                      transition: 'width 0.4s ease-out'
                     }} />
-                    <style>{`
-                      @keyframes progress {
-                        0% { width: 10%; }
-                        50% { width: 70%; }
-                        100% { width: 100%; }
-                      }
-                    `}</style>
                   </div>
                 </div>
               ) : result ? (
@@ -1127,8 +1277,8 @@ export default function App() {
                     position: 'absolute',
                     top: 0, left: 0, right: 0, bottom: 0
                   }}>
-                    <span style={{ fontSize: '32px' }}>👤</span>
-                    <div style={{ fontWeight: '700', fontSize: '16px', color: '#fff' }}>No Candidate Profiles Resolved</div>
+                    <FlaskIllustration />
+                    <div style={{ fontWeight: '700', fontSize: '16px', color: 'var(--accent-gold)' }}>No Candidate Profiles Resolved</div>
                     <p style={{ fontSize: '12px', maxWidth: '300px' }}>
                       The ingested sources did not contain any valid candidate records or could not be successfully resolved.
                     </p>
@@ -1143,8 +1293,8 @@ export default function App() {
                     right: 0,
                     bottom: 0
                   }}>
-                    {result.map((profile) => (
-                      <CandidateCard key={profile.candidate_id} profile={profile} />
+                    {result.map((profile, idx) => (
+                      <CandidateCard key={profile.candidate_id} profile={profile} index={idx} />
                     ))}
                   </div>
                 )
@@ -1154,17 +1304,19 @@ export default function App() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   height: '100%',
-                  color: 'var(--text-dark)',
+                  color: 'var(--text-muted)',
                   flexDirection: 'column',
-                  gap: '8px',
+                  gap: '12px',
                   position: 'absolute',
-                  top: 0, left: 0, right: 0, bottom: 0
+                  top: 0, left: 0, right: 0, bottom: 0,
+                  textAlign: 'center',
+                  padding: '20px'
                 }}>
-                  <span>⚡</span>
-                  <span>Ready to transform candidate profiles.</span>
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                    Upload files, add profile URLs, and click Execute.
-                  </span>
+                  <FlaskIllustration />
+                  <div style={{ fontWeight: '700', fontSize: '16px', color: 'var(--accent-gold)' }}>Ready to Refine Profiles</div>
+                  <p style={{ fontSize: '12px', maxWidth: '300px' }}>
+                    Upload messy files, input candidate URLs, and click the execute button to initiate candidate data alchemy.
+                  </p>
                 </div>
               )}
             </div>
