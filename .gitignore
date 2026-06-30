@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+/client/node_modules/
+/server/node_modules/
+
+# Production builds
+/client/dist/
+
+# Local Environment Variables
+.env
+/server/.env
+
+# Temporary / Local Outputs
+*.json
+!package.json
+!package-lock.json
+!config.example.json
+!client/package.json
+!client/package-lock.json
+!server/package.json
+!server/package-lock.json
+*.log
+scratch/

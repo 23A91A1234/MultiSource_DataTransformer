@@ -1,0 +1,6 @@
+name,email,phone,current_company,title
+Alice Smith,alice.smith@example.com,4155551111,Google,Senior Eng
+Bob Jones,bob.jones@example.com,4155552222,Meta,Tech Lead
+Charlie Brown,charlie.brown@example.com,4155553333,Netflix,Manager
+David Miller,david.miller@example.com,4155554444,Apple,Director
+Eva Green,eva.green@example.com,4155555555,Amazon,VP

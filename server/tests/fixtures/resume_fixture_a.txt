@@ -1,0 +1,12 @@
+John Doe
+johndoe@example.com
+(555) 555-5555
+
+EXPERIENCE
+Senior Engineer - Acme Corp (Jan 2020 - Dec 2022)
+• Developed features and maintained codebases.
+• Led a team of junior engineers.
+
+EDUCATION
+Acme University (2015 - 2019)
+Bachelor of Science, Computer Science

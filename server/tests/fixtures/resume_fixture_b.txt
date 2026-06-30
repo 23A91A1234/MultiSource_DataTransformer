@@ -1,0 +1,12 @@
+Jane Smith
+janesmith@example.com
+(555) 555-1234
+
+EXPERIENCE
+Software Engineer at Globex Inc, 2019 - 2021
+• Built microservices and optimized queries.
+• Implemented CI/CD pipelines.
+
+EDUCATION
+Globex University
+Master of Science in Data Science (2017 - 2019)
